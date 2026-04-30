@@ -1,0 +1,27 @@
+# docker-compose.yml
+#
+# LOCAL DEVELOPMENT ONLY — this file is NOT used on Railway.
+# Railway runs the mongo:7 image as a standalone Docker service whose volume
+# mount (/data/db) and environment variables are configured in the Railway
+# dashboard.  See railway-mongo-notes.md for full Railway setup instructions.
+
+version: "3.9"
+
+services:
+  mongo:
+    image: mongo:7
+    container_name: whatsapp_logs_mongo
+    restart: unless-stopped
+    environment:
+      MONGO_INITDB_DATABASE: whatsapp_logs
+    ports:
+      - "27017:27017"
+    volumes:
+      # Persistent data volume — survives container restarts.
+      - mongo_data:/data/db
+      # Initialization script — executed once when the data directory is empty.
+      - ./mongo-init.js:/docker-entrypoint-initdb.d/mongo-init.js:ro
+
+volumes:
+  mongo_data:
+    driver: local
